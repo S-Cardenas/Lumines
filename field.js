@@ -10,6 +10,7 @@ function Field(canvas) {
   this.topOffset = 60;
   this.bottomOffset = 60;
   this.activeBrick = undefined;
+  this.spacePressed = false;
   let ctx = canvas.getContext('2d');
 
   //Initialize the field as empty
@@ -67,6 +68,16 @@ function Field(canvas) {
       let y = this.activeBrick.all[i].y;
       this.grid[y][x] = this.activeBrick.all[i];
     }
+  };
+
+  // handler for user input
+  this.keyDownHandler = function(e) {
+    this.grid = this.activeBrick.keyDownHandler(e, this.grid);
+  };
+
+  //automatically move the bricks;
+  this.autoMoveBricks = function() {
+    this.grid = this.activeBrick.autoMove(this.grid);
   };
 }
 

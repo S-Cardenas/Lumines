@@ -45,13 +45,24 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	const Field = __webpack_require__(1);
-	const Bricks = __webpack_require__(2);
 
 	var canvas = document.getElementById('myCanvas');
+	var ctx = canvas.getContext("2d");
 	var field = new Field(canvas);
-	field.createNewBrick();
-	field.addBrickToField();
-	field.drawField();
+	document.addEventListener("keydown", field.keyDownHandler.bind(field), false);
+
+
+	function init() {
+	  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+	  field.createNewBrick();
+	  field.addBrickToField();
+	  field.drawField();
+	  // setInterval(field.autoMoveBricks.bind(field), 300);
+	  field.autoMoveBricks();
+	}
+
+	setInterval(init, 100);
 
 
 /***/ },
@@ -70,6 +81,7 @@
 	  this.topOffset = 60;
 	  this.bottomOffset = 60;
 	  this.activeBrick = undefined;
+	  this.spacePressed = false;
 	  let ctx = canvas.getContext('2d');
 
 	  //Initialize the field as empty
@@ -128,6 +140,16 @@
 	      this.grid[y][x] = this.activeBrick.all[i];
 	    }
 	  };
+
+	  // handler for user input
+	  this.keyDownHandler = function(e) {
+	    this.grid = this.activeBrick.keyDownHandler(e, this.grid);
+	  };
+
+	  //automatically move the bricks;
+	  this.autoMoveBricks = function() {
+	    this.grid = this.activeBrick.autoMove(this.grid);
+	  };
 	}
 
 	module.exports = Field;
@@ -141,18 +163,122 @@
 	  // array that holds the brick elements
 	  this.all = new Array();
 	  this.gridWidth = 16;
+	  this.spacePressed = false;
 	  //populate the bricks with individual Bricks
 	  let ps = -1;
 	  for (let i = 0; i < 2; i++) {
 	    for (let j = 0; j < 2; j++) {
 	      ps ++;
 	      this.all.push({x : (this.gridWidth/2 + i),
-	        y : j,
-	        active : true,
+	        y: j,
+	        active: true,
 	        pos: ps,
 	        color: Math.floor(Math.random() * (3 - 1)) + 1});
 	    }
 	  }
+	  this.autoMove = function(grid) {
+	    //check condition for moving a block
+	    //first check bottom blocks, then top blocks
+	    //1) are we at bottom of grid?
+	    //2) is there a block underneath?
+	    //order of checking [1,3,0,2]
+	    let order = [1,3,0,2];
+	    for (let i = 0; i < order.length; i++) {
+	      let block = this.all[order[i]];
+	      if (this._atBottom(block)) {
+	        continue;}
+	      else if (!this._blockBeneath(block, grid)) {
+	        let oldX = block.x;
+	        let oldY = block.y;
+	        if (this.spacePressed) {
+	          block.y += 3;
+	        }
+	        else {
+	          block.y++;
+	        }
+	        grid[oldY][oldX] = 0;
+	      }
+	    }
+	    return grid;
+	  };
+
+	  this._atBottom = function(block) {
+	    if (block.y > 10) {
+	      return true;
+	    }
+	    else {
+	      return false;
+	    }
+	  };
+
+	  this._blockBeneath = function(block, grid) {
+	    let x = block.x,
+	        y = block.y;
+
+	    if (grid[y + 1][x] !== 0) {
+	      return true;
+	    }
+	    else {
+	      return false;
+	    }
+	  };
+
+	  this.keyDownHandler = function(e, grid) {
+	    // displace active brick one unit to the left
+	    if (e.keyCode === 37 && this.all[0].x > 0) {
+
+	      if (grid[this.all[0].y][this.all[0].x - 1] !== 0) {return grid;}
+	      let oldX = this.all[3].x,
+	          oldY1 = this.all[2].y,
+	          oldY2 = this.all[3].y;
+	      for (let i = 0; i < 4; i++) {
+	        this.all[i].x--;
+	      }
+	      grid[oldY1][oldX] = 0;
+	      grid[oldY2][oldX] = 0;
+	      return grid;
+	    }
+	    // displace active brick unit to the right
+	    else if (e.keyCode === 39 && this.all[3].x < 15) {
+	      if (grid[this.all[3].y][this.all[3].x + 1] !== 0) {return grid;}
+	      let oldX = this.all[0].x,
+	          oldY1 = this.all[0].y,
+	          oldY2 = this.all[1].y;
+	      for (let i = 0; i < 4; i++) {
+	        this.all[i].x++;
+	      }
+	      grid[oldY1][oldX] = 0;
+	      grid[oldY2][oldX] = 0;
+	      return grid;
+	    }
+	    // rotate the active brick counter-clockwise
+	    else if (e.keyCode === 38) {
+	      let colors = [];
+	      colors[0] = this.all[2].color; colors[1] = this.all[0].color;
+	      colors[2] = this.all[3].color; colors[3] = this.all[1].color;
+	      for (let i = 0; i < 4; i++) {
+	        this.all[i].color = colors[i];
+	      }
+	      return grid;
+	    }
+	    // rotate the active brick clock-wise
+	    else if (e.keyCode === 40) {
+	      let colors = [];
+	      colors[0] = this.all[1].color; colors[1] = this.all[3].color;
+	      colors[2] = this.all[0].color; colors[3] = this.all[2].color;
+	      for (let i = 0; i < 4; i++) {
+	        this.all[i].color = colors[i];
+	      }
+	      return grid;
+	    }
+	    else if(e.keyCode === 32) {
+	      this.spacePressed = true;
+	      return grid;
+	    }
+	    else {
+	      return grid;
+	    }
+	  };
 	}
 
 	module.exports = Bricks;

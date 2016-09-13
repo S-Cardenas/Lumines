@@ -1,8 +1,18 @@
 const Field = require('./field');
-const Bricks = require('./bricks');
 
 var canvas = document.getElementById('myCanvas');
+var ctx = canvas.getContext("2d");
 var field = new Field(canvas);
-field.createNewBrick();
-field.addBrickToField();
-field.drawField();
+document.addEventListener("keydown", field.keyDownHandler.bind(field), false);
+
+
+function init() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  field.createNewBrick();
+  field.addBrickToField();
+  field.drawField();
+  field.autoMoveBricks();
+}
+
+setInterval(init, 100);

@@ -10,9 +10,9 @@ function init() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   field.createNewBrick();
-  field.addBrickToField();
+  field._addBrickToField();
   field.drawField();
   field.autoMoveBricks();
 }
 
-setInterval(init, 100);
+setInterval(init, 1000);

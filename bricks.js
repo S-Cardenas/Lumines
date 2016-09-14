@@ -27,48 +27,52 @@ function Bricks() {
       let block = this.all[order[i]];
       if (this._atBottom(block) || this._blockBeneath(block, grid, 1)) {continue;}
       else if (!this.spacePressed) {
-        let oldX = block.x,
-            oldY = block.y;
-        block.y++;
-        grid[oldY][oldX] = 0;
+        this._updateGrid(block, grid, 1);
       }
       else if (this.spacePressed) {
         if (!this._moveBelowBottom(block, 3)) {
           if (this._blockBeneath(block, grid, 3)) {
-            let existingBlockY = this._nextBlockY(block, grid);
-            let oldX = block.x,
-                oldY = block.y;
-            block.y += (existingBlockY - block.y - 1);
-            grid[oldY][oldX] = 0;
+            this._updateGrid(block, grid, 2);
           }
           else {
-            let oldX = block.x,
-                oldY = block.y;
-            block.y += 3;
-            grid[block.y][block.x] = block;
-            grid[oldY][oldX] = 0;
+            this._updateGrid(block, grid, 3);
           }
         }
         else if(this._moveBelowBottom(block, 3)) {
           if (this._blockBeneath(block, grid, 3)) {
-            let existingBlockY = this._nextBlockY(block, grid);
-            let oldX = block.x,
-                oldY = block.y;
-            block.y += (existingBlockY - block.y - 1);
-            grid[block.y][block.x] = block;
-            grid[oldY][oldX] = 0;
+            this._updateGrid(block, grid, 2);
           }
           else {
-            let oldX = block.x,
-                oldY = block.y;
-            block.y += ((this.gridHeight - 1) - block.y);
-            grid[block.y][block.x] = block;
-            grid[oldY][oldX] = 0;
+            this._updateGrid(block, grid, 4);
           }
         }
       }
     }
     return grid;
+  };
+
+  //check if the activeBrick has stopped moving
+  this._stoppedMoving = function(grid) {
+    let order = [1, 3, 0, 2];
+    for (let i = 0; i < order.length; i++) {
+      let block = this.all[order[i]];
+      if (this._atBottom(block)) {
+        continue;
+      }
+      else if (!this._blockBeneath(block, grid, 1)) {
+
+        return false;
+      }
+    }
+    return true;
+  };
+
+  //check if the blocks are split
+  this._brickSplit = function(grid) {
+    if (this.all[1].y !== this.all[3].y) {
+      return true;
+    }
+    return false;
   };
 
   // check if the block is moving below the bottom
@@ -111,6 +115,40 @@ function Bricks() {
       if (grid[i][x] !== 0) {return i;}
     }
     return false;
+  };
+
+  //update the grid and block based on new brick location
+  this._updateGrid = function(block, grid, key) {
+    let oldX = block.x,
+        oldY = block.y;
+    switch(key) {
+      case 1:
+        //block is just falling vertically by one position
+        block.y++;
+        grid[block.y][block.x] = block;
+        grid[oldY][oldX] = 0;
+        break;
+      case 2:
+        //there is a block below current block. move current block on top of
+        //block below.
+        let existingBlockY = this._nextBlockY(block, grid);
+        block.y += (existingBlockY - block.y - 1);
+        grid[block.y][block.x] = block;
+        grid[oldY][oldX] = 0;
+        break;
+      case 3:
+        //block is incrementing at a rate of 3 vertical locations
+        block.y += 3;
+        grid[block.y][block.x] = block;
+        grid[oldY][oldX] = 0;
+        break;
+      case 4:
+        //block is moving to the bottom of the grid
+        block.y += ((this.gridHeight - 1) - block.y);
+        grid[block.y][block.x] = block;
+        grid[oldY][oldX] = 0;
+        break;
+    }
   };
 
   this.keyDownHandler = function(e, grid) {

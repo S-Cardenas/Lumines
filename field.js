@@ -62,7 +62,7 @@ function Field(canvas) {
   };
 
   //Add new brick to the field
-  this.addBrickToField = function() {
+  this._addBrickToField = function() {
     for (let i = 0; i < 4; i++) {
       let x = this.activeBrick.all[i].x;
       let y = this.activeBrick.all[i].y;
@@ -72,12 +72,18 @@ function Field(canvas) {
 
   // handler for user input
   this.keyDownHandler = function(e) {
-    this.grid = this.activeBrick.keyDownHandler(e, this.grid);
+    if (!this.activeBrick._brickSplit(this.grid)) {
+      this.grid = this.activeBrick.keyDownHandler(e, this.grid);
+    }
+
   };
 
   //automatically move the bricks;
   this.autoMoveBricks = function() {
-    this.grid = this.activeBrick.autoMove(this.grid);
+    if (this.activeBrick._stoppedMoving(this.grid)) {
+      this.activeBrick = undefined;
+    }
+    if (this.activeBrick) {this.grid = this.activeBrick.autoMove(this.grid);}
   };
 }
 

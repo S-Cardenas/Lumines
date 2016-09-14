@@ -2,6 +2,7 @@ function Bricks() {
   // array that holds the brick elements
   this.all = new Array();
   this.gridWidth = 16;
+  this.gridHeight = 12;
   this.spacePressed = false;
   //populate the bricks with individual Bricks
   let ps = -1;
@@ -24,23 +25,59 @@ function Bricks() {
     let order = [1,3,0,2];
     for (let i = 0; i < order.length; i++) {
       let block = this.all[order[i]];
-      if (this._atBottom(block)) {
-        continue;}
-      else if (!this._blockBeneath(block, grid)) {
-        let oldX = block.x;
-        let oldY = block.y;
-        if (this.spacePressed) {
-          block.y += 3; //////// YOU ARE HERE. FIX THIS bugggggggg :) hAPPY THOUGHTS
-        }
-        else {
-          block.y++;
-        }
+      if (this._atBottom(block) || this._blockBeneath(block, grid, 1)) {continue;}
+      else if (!this.spacePressed) {
+        let oldX = block.x,
+            oldY = block.y;
+        block.y++;
         grid[oldY][oldX] = 0;
+      }
+      else if (this.spacePressed) {
+        if (!this._moveBelowBottom(block, 3)) {
+          if (this._blockBeneath(block, grid, 3)) {
+            let existingBlockY = this._nextBlockY(block, grid);
+            let oldX = block.x,
+                oldY = block.y;
+            block.y += (existingBlockY - block.y - 1);
+            grid[oldY][oldX] = 0;
+          }
+          else {
+            let oldX = block.x,
+                oldY = block.y;
+            block.y += 3;
+            grid[block.y][block.x] = block;
+            grid[oldY][oldX] = 0;
+          }
+        }
+        else if(this._moveBelowBottom(block, 3)) {
+          if (this._blockBeneath(block, grid, 3)) {
+            let existingBlockY = this._nextBlockY(block, grid);
+            let oldX = block.x,
+                oldY = block.y;
+            block.y += (existingBlockY - block.y - 1);
+            grid[block.y][block.x] = block;
+            grid[oldY][oldX] = 0;
+          }
+          else {
+            let oldX = block.x,
+                oldY = block.y;
+            block.y += ((this.gridHeight - 1) - block.y);
+            grid[block.y][block.x] = block;
+            grid[oldY][oldX] = 0;
+          }
+        }
       }
     }
     return grid;
   };
 
+  // check if the block is moving below the bottom
+  this._moveBelowBottom = function(block, inc) {
+    if (block.y + inc > this.gridHeight - 1) {return true;}
+    else {return false;}
+  };
+
+  // check if block is at bottom
   this._atBottom = function(block) {
     if (block.y > 10) {
       return true;
@@ -50,16 +87,30 @@ function Bricks() {
     }
   };
 
-  this._blockBeneath = function(block, grid) {
+// check if there is a block beneath at a distance of 'inc'
+  this._blockBeneath = function(block, grid, inc) {
+    let x = block.x,
+        y = block.y,
+        limit = y + inc + 1;
+
+    if (limit > 11) {limit = 12;}
+    for (let i = y + 1; i < limit; i++) {
+      if (grid[i][x] !== 0) {
+
+        return true;
+      }
+    }
+    return false;
+  };
+
+  //find the y coordinate of the next block directly below
+  this._nextBlockY = function(block, grid) {
     let x = block.x,
         y = block.y;
-
-    if (grid[y + 1][x] !== 0) {
-      return true;
+    for (let i = y + 1; i < this.gridHeight; i++) {
+      if (grid[i][x] !== 0) {return i;}
     }
-    else {
-      return false;
-    }
+    return false;
   };
 
   this.keyDownHandler = function(e, grid) {

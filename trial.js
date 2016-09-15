@@ -1,13 +1,14 @@
-function first() {
-  console.log('a');
-  return false;
-}
+let a = ['john'];
 
-function second() {
-  console.log('b');
-  return true;
-}
+let b = [a, 2, 3];
 
-if (first() || second()) {
-  console.log('c');
-}
+let c = [2, 4, a];
+
+console.log(a);
+console.log(b);
+console.log(c);
+
+a = ['stefan'];
+console.log(a);
+console.log(b);
+console.log(c);

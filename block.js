@@ -4,13 +4,69 @@ function Block() {
   this.x = undefined;
   this.y = undefined;
   this.color = undefined;
+  this.active = true;
   this.markedForDeletion = false;
 
 
 
   //Move block on each rendering
   this._autoMove = function(grid) {
+    if (!this._stoppedMoving(grid)) {
+      if (!this._moveBelowBottom(4)) {
 
+        if (this._blockBeneath(grid, 4)) {
+          this._updateGrid(grid, 2);
+        }
+        else {
+          this._updateGrid(grid, 3);
+        }
+      }
+      else if (this._moveBelowBottom(4)) {
+        if (this._blockBeneath(grid, 4)) {
+          this._updateGrid(grid, 2);
+        }
+        else {
+          this._updateGrid(grid, 4);
+        }
+      }
+    }
+    return grid;
+  };
+
+  //update the grid and block based on new location
+  this._updateGrid = function(grid, key) {
+    let oldX = this.x,
+        oldY = this.y;
+    switch(key) {
+      case 2:
+        // there is a block below current block. Move on top of it
+        let existingBlockY = this._nextBlockY(grid);
+        this.y += (existingBlockY - this.y - 1);
+        grid[this.y][this.x] = this;
+        grid[oldY][oldX] = 0;
+        break;
+      case 3:
+        //block is incrementing at a rate of 4 vertical locations
+        this.y += 4;
+        grid[this.y][this.x] = this;
+        grid[oldY][oldX] = 0;
+        break;
+      case 4:
+        //block is to be moved to the bottom of the grid
+        this.y += ((this.gridHeight - 1) - this.y);
+        grid[this.y][this.x] = this;
+        grid[oldY][oldX] = 0;
+        break;
+    }
+  };
+
+  this._nextBlockY = function(grid) {
+    let x = this.x,
+        y = this.y;
+    for (let i = y + 1; i < this.gridHeight; i++) {
+      if (grid[i][x] !== 0) {return i;}
+    }
+    return false;
   };
 
   //check if block is at bottom of grid
@@ -24,15 +80,17 @@ function Block() {
     let x = this.x,
         y = this.y,
         limit = y + inc + 1;
-        // console.log('here');
-        console.log(grid);
 
     if (limit > 11) {limit = 12;}
     for (let i = y + 1; i < limit; i++) {
-      console.log('i:');
-      console.log(i);
       if (grid[i][x] !== 0) {return true;}
     }
+    return false;
+  };
+
+  //check if the next movement will put you below the bottom
+  this._moveBelowBottom = function(inc) {
+    if (this.y + inc > this.gridHeight - 1) {return true;}
     return false;
   };
 

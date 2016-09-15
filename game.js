@@ -16,4 +16,4 @@ function init() {
   field.autoMoveBricks();
 }
 
-setInterval(init, 250);
+setInterval(init, 150);

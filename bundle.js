@@ -62,7 +62,7 @@
 	  field.autoMoveBricks();
 	}
 
-	setInterval(init, 250);
+	setInterval(init, 150);
 
 
 /***/ },
@@ -152,11 +152,25 @@
 	  //automatically move the bricks;
 	  this.autoMoveBricks = function() {
 	    if (this.activeBrick._stoppedMoving(this.grid)) {
+	      this.activeBrick._setBlocksInactive();
 	      this.activeBrick = undefined;
 	      this._checkBlocksForDeletion();
 	      this._deleteBlocks();
 	    }
-	    if (this.activeBrick) {this.grid = this.activeBrick.autoMove(this.grid);}
+	    if (this.activeBrick) {
+	      this.grid = this.activeBrick.autoMove(this.grid);
+	      // let locations = [];
+	      // for (let i = 0; i < this.activeBrick.all.length; i++) {
+	      //
+	      // }
+	      for (let i = 2; i < this.height - 1; i++) {
+	        for (let j = 0; j < this.width; j++) {
+	          if (this.grid[i][j] !== 0 && !this.grid[i][j].active) {
+	            this.grid = this.grid[i][j]._autoMove(this.grid);
+	          }
+	        }
+	      }
+	    }
 	  };
 
 	  //check which blocks need to be deleted
@@ -259,6 +273,13 @@
 	      }
 	    }
 	    return true;
+	  };
+
+	  //mark all the blocks as inactive
+	  this._setBlocksInactive = function() {
+	    for (let i = 0; i < this.all.length; i++) {
+	      this.all[i].active = false;
+	    }
 	  };
 
 	  //check if the blocks are split
@@ -416,13 +437,69 @@
 	  this.x = undefined;
 	  this.y = undefined;
 	  this.color = undefined;
+	  this.active = true;
 	  this.markedForDeletion = false;
 
 
 
 	  //Move block on each rendering
 	  this._autoMove = function(grid) {
+	    if (!this._stoppedMoving(grid)) {
+	      if (!this._moveBelowBottom(4)) {
 
+	        if (this._blockBeneath(grid, 4)) {
+	          this._updateGrid(grid, 2);
+	        }
+	        else {
+	          this._updateGrid(grid, 3);
+	        }
+	      }
+	      else if (this._moveBelowBottom(4)) {
+	        if (this._blockBeneath(grid, 4)) {
+	          this._updateGrid(grid, 2);
+	        }
+	        else {
+	          this._updateGrid(grid, 4);
+	        }
+	      }
+	    }
+	    return grid;
+	  };
+
+	  //update the grid and block based on new location
+	  this._updateGrid = function(grid, key) {
+	    let oldX = this.x,
+	        oldY = this.y;
+	    switch(key) {
+	      case 2:
+	        // there is a block below current block. Move on top of it
+	        let existingBlockY = this._nextBlockY(grid);
+	        this.y += (existingBlockY - this.y - 1);
+	        grid[this.y][this.x] = this;
+	        grid[oldY][oldX] = 0;
+	        break;
+	      case 3:
+	        //block is incrementing at a rate of 4 vertical locations
+	        this.y += 4;
+	        grid[this.y][this.x] = this;
+	        grid[oldY][oldX] = 0;
+	        break;
+	      case 4:
+	        //block is to be moved to the bottom of the grid
+	        this.y += ((this.gridHeight - 1) - this.y);
+	        grid[this.y][this.x] = this;
+	        grid[oldY][oldX] = 0;
+	        break;
+	    }
+	  };
+
+	  this._nextBlockY = function(grid) {
+	    let x = this.x,
+	        y = this.y;
+	    for (let i = y + 1; i < this.gridHeight; i++) {
+	      if (grid[i][x] !== 0) {return i;}
+	    }
+	    return false;
 	  };
 
 	  //check if block is at bottom of grid
@@ -436,15 +513,17 @@
 	    let x = this.x,
 	        y = this.y,
 	        limit = y + inc + 1;
-	        // console.log('here');
-	        console.log(grid);
 
 	    if (limit > 11) {limit = 12;}
 	    for (let i = y + 1; i < limit; i++) {
-	      console.log('i:');
-	      console.log(i);
 	      if (grid[i][x] !== 0) {return true;}
 	    }
+	    return false;
+	  };
+
+	  //check if the next movement will put you below the bottom
+	  this._moveBelowBottom = function(inc) {
+	    if (this.y + inc > this.gridHeight - 1) {return true;}
 	    return false;
 	  };
 

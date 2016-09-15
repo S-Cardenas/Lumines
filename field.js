@@ -81,11 +81,25 @@ function Field(canvas) {
   //automatically move the bricks;
   this.autoMoveBricks = function() {
     if (this.activeBrick._stoppedMoving(this.grid)) {
+      this.activeBrick._setBlocksInactive();
       this.activeBrick = undefined;
       this._checkBlocksForDeletion();
       this._deleteBlocks();
     }
-    if (this.activeBrick) {this.grid = this.activeBrick.autoMove(this.grid);}
+    if (this.activeBrick) {
+      this.grid = this.activeBrick.autoMove(this.grid);
+      // let locations = [];
+      // for (let i = 0; i < this.activeBrick.all.length; i++) {
+      //
+      // }
+      for (let i = 2; i < this.height - 1; i++) {
+        for (let j = 0; j < this.width; j++) {
+          if (this.grid[i][j] !== 0 && !this.grid[i][j].active) {
+            this.grid = this.grid[i][j]._autoMove(this.grid);
+          }
+        }
+      }
+    }
   };
 
   //check which blocks need to be deleted

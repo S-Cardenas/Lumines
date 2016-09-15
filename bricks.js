@@ -68,6 +68,13 @@ function Bricks() {
     return true;
   };
 
+  //mark all the blocks as inactive
+  this._setBlocksInactive = function() {
+    for (let i = 0; i < this.all.length; i++) {
+      this.all[i].active = false;
+    }
+  };
+
   //check if the blocks are split
   this._brickSplit = function(grid) {
     if (this.all[1].y !== this.all[3].y) {

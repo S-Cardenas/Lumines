@@ -49,7 +49,7 @@
 	var canvas = document.getElementById('myCanvas');
 	var ctx = canvas.getContext("2d");
 	var field = new Field(canvas);
-
+	var fps = 5;
 
 	document.addEventListener("keydown", field.keyDownHandler.bind(field), false);
 
@@ -63,9 +63,12 @@
 	  field.drawNextBricks();
 	  field.drawField();
 	  field.autoMoveBricks();
+	  setTimeout(function(){
+	    requestAnimationFrame(init);}, 1000 / fps);
+
 	}
 
-	setInterval(init, 150);
+	init();
 
 
 /***/ },

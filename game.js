@@ -4,6 +4,7 @@ var canvas = document.getElementById('myCanvas');
 var ctx = canvas.getContext("2d");
 var field = new Field(canvas);
 
+
 document.addEventListener("keydown", field.keyDownHandler.bind(field), false);
 
 function init() {
@@ -15,4 +16,4 @@ function init() {
   field.autoMoveBricks();
 }
 
-setInterval(init, 1000);
+setInterval(init, 250);

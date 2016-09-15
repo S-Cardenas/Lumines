@@ -1,3 +1,5 @@
+const Block = require('./block');
+
 function Bricks() {
   // array that holds the brick elements
   this.all = new Array();
@@ -8,12 +10,11 @@ function Bricks() {
   let ps = -1;
   for (let i = 0; i < 2; i++) {
     for (let j = 0; j < 2; j++) {
-      ps ++;
-      this.all.push({x : (this.gridWidth/2 + i),
-        y: j,
-        active: true,
-        pos: ps,
-        color: Math.floor(Math.random() * (3 - 1)) + 1});
+      let block = new Block();
+      block.x = (this.gridWidth / 2) + i;
+      block.y = j;
+      block.color = Math.floor(Math.random() * (3 - 1)) + 1;
+      this.all.push(block);
     }
   }
   this.autoMove = function(grid) {

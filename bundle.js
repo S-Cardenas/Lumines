@@ -50,6 +50,7 @@
 	var ctx = canvas.getContext("2d");
 	var field = new Field(canvas);
 
+
 	document.addEventListener("keydown", field.keyDownHandler.bind(field), false);
 
 	function init() {
@@ -61,7 +62,7 @@
 	  field.autoMoveBricks();
 	}
 
-	setInterval(init, 1000);
+	setInterval(init, 250);
 
 
 /***/ },
@@ -152,17 +153,45 @@
 	  this.autoMoveBricks = function() {
 	    if (this.activeBrick._stoppedMoving(this.grid)) {
 	      this.activeBrick = undefined;
+	      this._checkBlocksForDeletion();
+	      this._deleteBlocks();
 	    }
 	    if (this.activeBrick) {this.grid = this.activeBrick.autoMove(this.grid);}
 	  };
+
+	  //check which blocks need to be deleted
+	  this._checkBlocksForDeletion = function() {
+	    for (let i = 2; i < this.height - 1; i++) {
+	      for (let j = 0; j < this.width - 1; j++) {
+	        if (this.grid[i][j] !== 0) {
+	          this.grid[i][j].updateDeletionStatus(this.grid);
+	        }
+	      }
+	    }
+	  };
+
+	  // delete blocks that have been marked for deletion
+	  this._deleteBlocks = function() {
+	    for (let i = 2; i < this.height; i++) {
+	      for (let j = 0; j < this.width; j++) {
+	        if (this.grid[i][j].markedForDeletion) {
+	          this.grid[i][j] = 0;
+	        }
+	      }
+	    }
+	  };
+
 	}
+
 
 	module.exports = Field;
 
 
 /***/ },
 /* 2 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
+
+	const Block = __webpack_require__(3);
 
 	function Bricks() {
 	  // array that holds the brick elements
@@ -174,12 +203,11 @@
 	  let ps = -1;
 	  for (let i = 0; i < 2; i++) {
 	    for (let j = 0; j < 2; j++) {
-	      ps ++;
-	      this.all.push({x : (this.gridWidth/2 + i),
-	        y: j,
-	        active: true,
-	        pos: ps,
-	        color: Math.floor(Math.random() * (3 - 1)) + 1});
+	      let block = new Block();
+	      block.x = (this.gridWidth / 2) + i;
+	      block.y = j;
+	      block.color = Math.floor(Math.random() * (3 - 1)) + 1;
+	      this.all.push(block);
 	    }
 	  }
 	  this.autoMove = function(grid) {
@@ -376,6 +404,81 @@
 	}
 
 	module.exports = Bricks;
+
+
+/***/ },
+/* 3 */
+/***/ function(module, exports) {
+
+	function Block() {
+	  this.gridWidth = 16;
+	  this.gridHeight = 12;
+	  this.x = undefined;
+	  this.y = undefined;
+	  this.color = undefined;
+	  this.markedForDeletion = false;
+
+
+
+	  //Move block on each rendering
+	  this._autoMove = function(grid) {
+
+	  };
+
+	  //check if block is at bottom of grid
+	  this._atBottom = function() {
+	    if (this.y > 10) {return true;}
+	    return false;
+	  };
+
+	  //check if there is another block at a distance (inc) below current block
+	  this._blockBeneath = function(grid, inc) {
+	    let x = this.x,
+	        y = this.y,
+	        limit = y + inc + 1;
+	        // console.log('here');
+	        console.log(grid);
+
+	    if (limit > 11) {limit = 12;}
+	    for (let i = y + 1; i < limit; i++) {
+	      console.log('i:');
+	      console.log(i);
+	      if (grid[i][x] !== 0) {return true;}
+	    }
+	    return false;
+	  };
+
+	  // check if current block makes a same-color square in the grid
+	  this.updateDeletionStatus = function(grid) {
+	    let status = true;
+	    for (let i = 0; i < 2; i++) {
+	      for (let j = 0; j < 2; j++) {
+	        if (i === 0 && j === 0) {continue;}
+	        else if (this.color !== grid[this.y + i][this.x + j].color || !grid[this.y + i][this.x + j]._stoppedMoving(grid)) {
+	          status = false;
+	          break;
+	        }
+	      }
+	    }
+	    if (status) {
+	      for (let i = 0; i < 2; i++) {
+	        for (let j = 0; j < 2; j++) {
+	          grid[this.y + i][this.x + j].markedForDeletion = true;
+	        }
+	      }
+	    }
+	  };
+
+	  //check if block has stopped moving
+	  this._stoppedMoving = function(grid) {
+	    if (this._atBottom() || this._blockBeneath(grid, 1)) {
+	      return true;
+	    }
+	    return false;
+	  };
+	}
+
+	module.exports = Block;
 
 
 /***/ }

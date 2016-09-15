@@ -17,7 +17,6 @@ function Bricks() {
     }
   }
 
-
   this.autoMove = function(grid) {
     //check condition for moving a block
     //first check bottom blocks, then top blocks
@@ -28,25 +27,19 @@ function Bricks() {
     for (let i = 0; i < order.length; i++) {
       let block = this.all[order[i]];
       if (this._atBottom(block) || this._blockBeneath(block, grid, 1)) {continue;}
-      else if (!this.spacePressed) {
-        this._updateGrid(block, grid, 1);
-      }
+      else if (!this.spacePressed) {this._updateGrid(block, grid, 1);}
       else if (this.spacePressed) {
         if (!this._moveBelowBottom(block, 3)) {
           if (this._blockBeneath(block, grid, 3)) {
             this._updateGrid(block, grid, 2);
           }
-          else {
-            this._updateGrid(block, grid, 3);
-          }
+          else {this._updateGrid(block, grid, 3);}
         }
         else if(this._moveBelowBottom(block, 3)) {
           if (this._blockBeneath(block, grid, 3)) {
             this._updateGrid(block, grid, 2);
           }
-          else {
-            this._updateGrid(block, grid, 4);
-          }
+          else {this._updateGrid(block, grid, 4);}
         }
       }
     }
@@ -58,13 +51,8 @@ function Bricks() {
     let order = [1, 3, 0, 2];
     for (let i = 0; i < order.length; i++) {
       let block = this.all[order[i]];
-      if (this._atBottom(block)) {
-        continue;
-      }
-      else if (!this._blockBeneath(block, grid, 1)) {
-
-        return false;
-      }
+      if (this._atBottom(block)) {continue;}
+      else if (!this._blockBeneath(block, grid, 1)) {return false;}
     }
     return true;
   };
@@ -91,9 +79,7 @@ function Bricks() {
 
   //check if the blocks are split
   this._brickSplit = function(grid) {
-    if (this.all[1].y !== this.all[3].y) {
-      return true;
-    }
+    if (this.all[1].y !== this.all[3].y) {return true;}
     return false;
   };
 
@@ -105,12 +91,8 @@ function Bricks() {
 
   // check if block is at bottom
   this._atBottom = function(block) {
-    if (block.y > 10) {
-      return true;
-    }
-    else {
-      return false;
-    }
+    if (block.y > 10) {return true;}
+    return false;
   };
 
 // check if there is a block beneath at a distance of 'inc'
@@ -121,10 +103,7 @@ function Bricks() {
 
     if (limit > 11) {limit = 12;}
     for (let i = y + 1; i < limit; i++) {
-      if (grid[i][x] !== 0) {
-
-        return true;
-      }
+      if (grid[i][x] !== 0) {return true;}
     }
     return false;
   };

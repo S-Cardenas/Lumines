@@ -7,27 +7,16 @@ function Block() {
   this.active = true;
   this.markedForDeletion = false;
 
-
-
   //Move block on each rendering
   this._autoMove = function(grid) {
     if (!this._stoppedMoving(grid)) {
       if (!this._moveBelowBottom(4)) {
-
-        if (this._blockBeneath(grid, 4)) {
-          this._updateGrid(grid, 2);
-        }
-        else {
-          this._updateGrid(grid, 3);
-        }
+        if (this._blockBeneath(grid, 4)) {this._updateGrid(grid, 2);}
+        else {this._updateGrid(grid, 3);}
       }
       else if (this._moveBelowBottom(4)) {
-        if (this._blockBeneath(grid, 4)) {
-          this._updateGrid(grid, 2);
-        }
-        else {
-          this._updateGrid(grid, 4);
-        }
+        if (this._blockBeneath(grid, 4)) {this._updateGrid(grid, 2);}
+        else {this._updateGrid(grid, 4);}
       }
     }
     return grid;

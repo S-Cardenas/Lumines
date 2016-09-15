@@ -56,6 +56,7 @@
 	function init() {
 	  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+	  field.drawScore();
 	  field._populateNextBricks();
 	  field.createNewBrick();
 	  field._addBrickToField();
@@ -64,7 +65,7 @@
 	  field.autoMoveBricks();
 	}
 
-	setInterval(init, 200);
+	setInterval(init, 150);
 
 
 /***/ },
@@ -86,6 +87,7 @@
 	  this.activeBrick = undefined;
 	  this.nextBricks = [];
 	  this.spacePressed = false;
+	  this.score = 0;
 	  let ctx = canvas.getContext('2d');
 
 	  //Initialize the field as empty
@@ -151,6 +153,24 @@
 	        ctx.closePath();
 	      }
 	    }
+	  };
+
+	  //draw the score
+	  this.drawScore = function() {
+	    //draw the score title
+	    ctx.beginPath();
+	    ctx.font = "30px serif";
+	    ctx.fillStyle = 'black';
+	    ctx.fillText('Score:', 630, 120);
+	    ctx.closePath();
+
+	    //draw the score value
+	    ctx.beginPath();
+	    ctx.font = "30px serif";
+	    ctx.fillStyle = 'black';
+	    ctx.fillText(this.score, 630, 160);
+	    ctx.closePath();
+
 	  };
 
 	  //Create a new active brick if there is none
@@ -223,13 +243,16 @@
 
 	  // delete blocks that have been marked for deletion
 	  this._deleteBlocks = function() {
+	    let tempScore = 0;
 	    for (let i = 2; i < this.height; i++) {
 	      for (let j = 0; j < this.width; j++) {
 	        if (this.grid[i][j].markedForDeletion) {
+	          tempScore += 1;
 	          this.grid[i][j] = 0;
 	        }
 	      }
 	    }
+	    this.score += tempScore * (tempScore / 4);
 	  };
 
 	}
@@ -261,7 +284,6 @@
 	    }
 	  }
 
-
 	  this.autoMove = function(grid) {
 	    //check condition for moving a block
 	    //first check bottom blocks, then top blocks
@@ -272,25 +294,19 @@
 	    for (let i = 0; i < order.length; i++) {
 	      let block = this.all[order[i]];
 	      if (this._atBottom(block) || this._blockBeneath(block, grid, 1)) {continue;}
-	      else if (!this.spacePressed) {
-	        this._updateGrid(block, grid, 1);
-	      }
+	      else if (!this.spacePressed) {this._updateGrid(block, grid, 1);}
 	      else if (this.spacePressed) {
 	        if (!this._moveBelowBottom(block, 3)) {
 	          if (this._blockBeneath(block, grid, 3)) {
 	            this._updateGrid(block, grid, 2);
 	          }
-	          else {
-	            this._updateGrid(block, grid, 3);
-	          }
+	          else {this._updateGrid(block, grid, 3);}
 	        }
 	        else if(this._moveBelowBottom(block, 3)) {
 	          if (this._blockBeneath(block, grid, 3)) {
 	            this._updateGrid(block, grid, 2);
 	          }
-	          else {
-	            this._updateGrid(block, grid, 4);
-	          }
+	          else {this._updateGrid(block, grid, 4);}
 	        }
 	      }
 	    }
@@ -302,13 +318,8 @@
 	    let order = [1, 3, 0, 2];
 	    for (let i = 0; i < order.length; i++) {
 	      let block = this.all[order[i]];
-	      if (this._atBottom(block)) {
-	        continue;
-	      }
-	      else if (!this._blockBeneath(block, grid, 1)) {
-
-	        return false;
-	      }
+	      if (this._atBottom(block)) {continue;}
+	      else if (!this._blockBeneath(block, grid, 1)) {return false;}
 	    }
 	    return true;
 	  };
@@ -335,9 +346,7 @@
 
 	  //check if the blocks are split
 	  this._brickSplit = function(grid) {
-	    if (this.all[1].y !== this.all[3].y) {
-	      return true;
-	    }
+	    if (this.all[1].y !== this.all[3].y) {return true;}
 	    return false;
 	  };
 
@@ -349,12 +358,8 @@
 
 	  // check if block is at bottom
 	  this._atBottom = function(block) {
-	    if (block.y > 10) {
-	      return true;
-	    }
-	    else {
-	      return false;
-	    }
+	    if (block.y > 10) {return true;}
+	    return false;
 	  };
 
 	// check if there is a block beneath at a distance of 'inc'
@@ -365,10 +370,7 @@
 
 	    if (limit > 11) {limit = 12;}
 	    for (let i = y + 1; i < limit; i++) {
-	      if (grid[i][x] !== 0) {
-
-	        return true;
-	      }
+	      if (grid[i][x] !== 0) {return true;}
 	    }
 	    return false;
 	  };
@@ -491,27 +493,16 @@
 	  this.active = true;
 	  this.markedForDeletion = false;
 
-
-
 	  //Move block on each rendering
 	  this._autoMove = function(grid) {
 	    if (!this._stoppedMoving(grid)) {
 	      if (!this._moveBelowBottom(4)) {
-
-	        if (this._blockBeneath(grid, 4)) {
-	          this._updateGrid(grid, 2);
-	        }
-	        else {
-	          this._updateGrid(grid, 3);
-	        }
+	        if (this._blockBeneath(grid, 4)) {this._updateGrid(grid, 2);}
+	        else {this._updateGrid(grid, 3);}
 	      }
 	      else if (this._moveBelowBottom(4)) {
-	        if (this._blockBeneath(grid, 4)) {
-	          this._updateGrid(grid, 2);
-	        }
-	        else {
-	          this._updateGrid(grid, 4);
-	        }
+	        if (this._blockBeneath(grid, 4)) {this._updateGrid(grid, 2);}
+	        else {this._updateGrid(grid, 4);}
 	      }
 	    }
 	    return grid;

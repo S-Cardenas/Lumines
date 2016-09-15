@@ -13,6 +13,7 @@ function Field(canvas) {
   this.activeBrick = undefined;
   this.nextBricks = [];
   this.spacePressed = false;
+  this.score = 0;
   let ctx = canvas.getContext('2d');
 
   //Initialize the field as empty
@@ -78,6 +79,24 @@ function Field(canvas) {
         ctx.closePath();
       }
     }
+  };
+
+  //draw the score
+  this.drawScore = function() {
+    //draw the score title
+    ctx.beginPath();
+    ctx.font = "30px serif";
+    ctx.fillStyle = 'black';
+    ctx.fillText('Score:', 630, 120);
+    ctx.closePath();
+
+    //draw the score value
+    ctx.beginPath();
+    ctx.font = "30px serif";
+    ctx.fillStyle = 'black';
+    ctx.fillText(this.score, 630, 160);
+    ctx.closePath();
+
   };
 
   //Create a new active brick if there is none
@@ -150,13 +169,16 @@ function Field(canvas) {
 
   // delete blocks that have been marked for deletion
   this._deleteBlocks = function() {
+    let tempScore = 0;
     for (let i = 2; i < this.height; i++) {
       for (let j = 0; j < this.width; j++) {
         if (this.grid[i][j].markedForDeletion) {
+          tempScore += 1;
           this.grid[i][j] = 0;
         }
       }
     }
+    this.score += tempScore * (tempScore / 4);
   };
 
 }

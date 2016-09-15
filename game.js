@@ -10,6 +10,7 @@ document.addEventListener("keydown", field.keyDownHandler.bind(field), false);
 function init() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+  field.drawScore();
   field._populateNextBricks();
   field.createNewBrick();
   field._addBrickToField();
@@ -18,4 +19,4 @@ function init() {
   field.autoMoveBricks();
 }
 
-setInterval(init, 200);
+setInterval(init, 150);

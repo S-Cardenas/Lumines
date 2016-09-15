@@ -6,10 +6,12 @@ function Field(canvas) {
   this.grid = new Array();
   this.cellSize = 30;
   this.leftOffset = 120;
+  this.nextBricksLeftOffset = 30;
   this.rightOffset = 30;
   this.topOffset = 60;
   this.bottomOffset = 60;
   this.activeBrick = undefined;
+  this.nextBricks = [];
   this.spacePressed = false;
   let ctx = canvas.getContext('2d');
 
@@ -53,11 +55,44 @@ function Field(canvas) {
     }
   };
 
+  //Draw the next bricks array on the left side
+  this.drawNextBricks = function() {
+    let offset = 90;
+    for (let k = 0; k < this.nextBricks.length; k++) {
+      let brick = this.nextBricks[k];
+      for (let m = 0; m < brick.all.length; m++) {
+        let i = undefined,
+            j = undefined;
+        (m < 2) ? i = 0 : i = 1;
+        (m % 2 === 0) ? j = 0 : j = 1;
+        ctx.beginPath();
+        ctx.strokeStyle = 'black';
+        // console.log(brick);
+        (brick.all[m].color === 1) ? ctx.fillStyle = 'red' : ctx.fillStyle = 'blue';
+        ctx.rect((this.nextBricksLeftOffset + i * 30),
+                (this.topOffset + (offset * k) + (j * 30)),
+                this.cellSize,
+                this.cellSize);
+        ctx.stroke();
+        ctx.fill();
+        ctx.closePath();
+      }
+    }
+  };
+
   //Create a new active brick if there is none
   this.createNewBrick = function() {
     if (!this.activeBrick) {
-      let newBricks = new Bricks();
-      this.activeBrick = newBricks;
+      // let newBricks = new Bricks();
+      this.activeBrick = this.nextBricks.shift();
+    }
+  };
+
+  //create the next bricks that will be visible on the left side
+  this._populateNextBricks = function() {
+    while (this.nextBricks.length < 3) {
+      let brick = new Bricks();
+      this.nextBricks.push(brick);
     }
   };
 
@@ -68,6 +103,7 @@ function Field(canvas) {
       let y = this.activeBrick.all[i].y;
       this.grid[y][x] = this.activeBrick.all[i];
     }
+    this.activeBrick._gameOver(this.grid);
   };
 
   // handler for user input
@@ -75,7 +111,6 @@ function Field(canvas) {
     if (!this.activeBrick._brickSplit(this.grid)) {
       this.grid = this.activeBrick.keyDownHandler(e, this.grid);
     }
-
   };
 
   //automatically move the bricks;

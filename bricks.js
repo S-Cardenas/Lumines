@@ -6,8 +6,7 @@ function Bricks() {
   this.gridWidth = 16;
   this.gridHeight = 12;
   this.spacePressed = false;
-  //populate the bricks with individual Bricks
-  let ps = -1;
+  //populate the bricks with individual blocks
   for (let i = 0; i < 2; i++) {
     for (let j = 0; j < 2; j++) {
       let block = new Block();
@@ -17,6 +16,8 @@ function Bricks() {
       this.all.push(block);
     }
   }
+
+
   this.autoMove = function(grid) {
     //check condition for moving a block
     //first check bottom blocks, then top blocks
@@ -68,7 +69,20 @@ function Bricks() {
     return true;
   };
 
-  //mark all the blocks as inactive
+  //check if the active brick can't move from the top of grid (ie GAME OVER)
+  this._gameOver = function(grid) {
+    let order = [1, 3];
+    for (let i = 0; i < order.length; i++) {
+      let block  = this.all[order[i]];
+      if (block.y < 2 && this._blockBeneath(block, grid, 1)) {
+        alert('Game Over');
+        document.location.reload();
+        break;
+      }
+    }
+  };
+
+  //mark all the blocks in current activeBrick as inactive
   this._setBlocksInactive = function() {
     for (let i = 0; i < this.all.length; i++) {
       this.all[i].active = false;

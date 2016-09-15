@@ -81,7 +81,7 @@ function Block() {
         y = this.y,
         limit = y + inc + 1;
 
-    if (limit > 11) {limit = 12;}
+    if (limit > this.gridHeight - 1) {limit = this.gridHeight;}
     for (let i = y + 1; i < limit; i++) {
       if (grid[i][x] !== 0) {return true;}
     }

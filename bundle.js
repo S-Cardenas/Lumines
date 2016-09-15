@@ -56,13 +56,15 @@
 	function init() {
 	  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+	  field._populateNextBricks();
 	  field.createNewBrick();
 	  field._addBrickToField();
+	  field.drawNextBricks();
 	  field.drawField();
 	  field.autoMoveBricks();
 	}
 
-	setInterval(init, 150);
+	setInterval(init, 200);
 
 
 /***/ },
@@ -77,10 +79,12 @@
 	  this.grid = new Array();
 	  this.cellSize = 30;
 	  this.leftOffset = 120;
+	  this.nextBricksLeftOffset = 30;
 	  this.rightOffset = 30;
 	  this.topOffset = 60;
 	  this.bottomOffset = 60;
 	  this.activeBrick = undefined;
+	  this.nextBricks = [];
 	  this.spacePressed = false;
 	  let ctx = canvas.getContext('2d');
 
@@ -124,11 +128,44 @@
 	    }
 	  };
 
+	  //Draw the next bricks array on the left side
+	  this.drawNextBricks = function() {
+	    let offset = 90;
+	    for (let k = 0; k < this.nextBricks.length; k++) {
+	      let brick = this.nextBricks[k];
+	      for (let m = 0; m < brick.all.length; m++) {
+	        let i = undefined,
+	            j = undefined;
+	        (m < 2) ? i = 0 : i = 1;
+	        (m % 2 === 0) ? j = 0 : j = 1;
+	        ctx.beginPath();
+	        ctx.strokeStyle = 'black';
+	        // console.log(brick);
+	        (brick.all[m].color === 1) ? ctx.fillStyle = 'red' : ctx.fillStyle = 'blue';
+	        ctx.rect((this.nextBricksLeftOffset + i * 30),
+	                (this.topOffset + (offset * k) + (j * 30)),
+	                this.cellSize,
+	                this.cellSize);
+	        ctx.stroke();
+	        ctx.fill();
+	        ctx.closePath();
+	      }
+	    }
+	  };
+
 	  //Create a new active brick if there is none
 	  this.createNewBrick = function() {
 	    if (!this.activeBrick) {
-	      let newBricks = new Bricks();
-	      this.activeBrick = newBricks;
+	      // let newBricks = new Bricks();
+	      this.activeBrick = this.nextBricks.shift();
+	    }
+	  };
+
+	  //create the next bricks that will be visible on the left side
+	  this._populateNextBricks = function() {
+	    while (this.nextBricks.length < 3) {
+	      let brick = new Bricks();
+	      this.nextBricks.push(brick);
 	    }
 	  };
 
@@ -139,6 +176,7 @@
 	      let y = this.activeBrick.all[i].y;
 	      this.grid[y][x] = this.activeBrick.all[i];
 	    }
+	    this.activeBrick._gameOver(this.grid);
 	  };
 
 	  // handler for user input
@@ -146,7 +184,6 @@
 	    if (!this.activeBrick._brickSplit(this.grid)) {
 	      this.grid = this.activeBrick.keyDownHandler(e, this.grid);
 	    }
-
 	  };
 
 	  //automatically move the bricks;
@@ -213,8 +250,7 @@
 	  this.gridWidth = 16;
 	  this.gridHeight = 12;
 	  this.spacePressed = false;
-	  //populate the bricks with individual Bricks
-	  let ps = -1;
+	  //populate the bricks with individual blocks
 	  for (let i = 0; i < 2; i++) {
 	    for (let j = 0; j < 2; j++) {
 	      let block = new Block();
@@ -224,6 +260,8 @@
 	      this.all.push(block);
 	    }
 	  }
+
+
 	  this.autoMove = function(grid) {
 	    //check condition for moving a block
 	    //first check bottom blocks, then top blocks
@@ -275,7 +313,20 @@
 	    return true;
 	  };
 
-	  //mark all the blocks as inactive
+	  //check if the active brick can't move from the top of grid (ie GAME OVER)
+	  this._gameOver = function(grid) {
+	    let order = [1, 3];
+	    for (let i = 0; i < order.length; i++) {
+	      let block  = this.all[order[i]];
+	      if (block.y < 2 && this._blockBeneath(block, grid, 1)) {
+	        alert('Game Over');
+	        document.location.reload();
+	        break;
+	      }
+	    }
+	  };
+
+	  //mark all the blocks in current activeBrick as inactive
 	  this._setBlocksInactive = function() {
 	    for (let i = 0; i < this.all.length; i++) {
 	      this.all[i].active = false;
@@ -514,7 +565,7 @@
 	        y = this.y,
 	        limit = y + inc + 1;
 
-	    if (limit > 11) {limit = 12;}
+	    if (limit > this.gridHeight - 1) {limit = this.gridHeight;}
 	    for (let i = y + 1; i < limit; i++) {
 	      if (grid[i][x] !== 0) {return true;}
 	    }

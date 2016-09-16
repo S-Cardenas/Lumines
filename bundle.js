@@ -56,6 +56,7 @@
 	function init() {
 	  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+	  field.drawLine();
 	  field.drawScore();
 	  field._populateNextBricks();
 	  field.createNewBrick();
@@ -63,6 +64,7 @@
 	  field.drawNextBricks();
 	  field.drawField();
 	  field.autoMoveBricks();
+	  field.moveLine();
 	  setTimeout(function(){
 	    requestAnimationFrame(init);}, 1000 / fps);
 
@@ -91,6 +93,7 @@
 	  this.nextBricks = [];
 	  this.spacePressed = false;
 	  this.score = 0;
+	  this.lineX = 120;
 	  let ctx = canvas.getContext('2d');
 
 	  //Initialize the field as empty
@@ -176,6 +179,24 @@
 
 	  };
 
+	  //draw the line which moves across the field
+	  this.drawLine = function() {
+	    ctx.beginPath();
+	    ctx.strokeStyle = 'purple';
+	    ctx.moveTo(this.lineX, 120);
+	    ctx.lineWidth = 5;
+	    ctx.lineTo(this.lineX, 420);
+	    ctx.stroke();
+	    ctx.lineWidth = 1;
+	    ctx.closePath();
+	  };
+
+	  //move the line
+	  this.moveLine = function() {
+	    if (this.lineX >= 600) {this.lineX = 120;}
+	    else {this.lineX += 20;}
+	  };
+
 	  //Create a new active brick if there is none
 	  this.createNewBrick = function() {
 	    if (!this.activeBrick) {
@@ -219,10 +240,8 @@
 	    }
 	    if (this.activeBrick) {
 	      this.grid = this.activeBrick.autoMove(this.grid);
-	      // let locations = [];
-	      // for (let i = 0; i < this.activeBrick.all.length; i++) {
-	      //
-	      // }
+	      //automove each individual block
+	      //CHANGE THIS TO AUTO MOVE THE BRICKS FROM THE BOTTOM TO THE TOP!!!!!
 	      for (let i = 2; i < this.height - 1; i++) {
 	        for (let j = 0; j < this.width; j++) {
 	          if (this.grid[i][j] !== 0 && !this.grid[i][j].active) {
@@ -231,13 +250,15 @@
 	        }
 	      }
 	    }
+	    // this._checkBlocksForDeletion();
+	    // this._deleteBlocks();
 	  };
 
 	  //check which blocks need to be deleted
 	  this._checkBlocksForDeletion = function() {
 	    for (let i = 2; i < this.height - 1; i++) {
 	      for (let j = 0; j < this.width - 1; j++) {
-	        if (this.grid[i][j] !== 0) {
+	        if (this.grid[i][j] !== 0 && !this.grid[i][j].active) {
 	          this.grid[i][j].updateDeletionStatus(this.grid);
 	        }
 	      }
@@ -249,7 +270,13 @@
 	    let tempScore = 0;
 	    for (let i = 2; i < this.height; i++) {
 	      for (let j = 0; j < this.width; j++) {
-	        if (this.grid[i][j].markedForDeletion) {
+	        let block = this.grid[i][j];
+	        let lineConversion = ((11/480) * this.lineX) - (11/4);
+	        // if (block.markedForDeletion && (lineConversion >= block.x + 1)) {
+	        //   tempScore += 1;
+	        //   this.grid[i][j] = 0;
+	        // }
+	        if (block.markedForDeletion) {
 	          tempScore += 1;
 	          this.grid[i][j] = 0;
 	        }

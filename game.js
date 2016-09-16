@@ -12,13 +12,14 @@ document.addEventListener("keydown", field.keyDownHandler.bind(field), false);
 function init() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-  field.drawLine();
+
   field.drawScore();
   field._populateNextBricks();
   field.createNewBrick();
   field._addBrickToField();
   field.drawNextBricks();
   field.drawField();
+  field.drawLine();
   field.autoMoveBricks();
   field.moveLine();
   setTimeout(function(){

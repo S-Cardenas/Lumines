@@ -58,13 +58,14 @@
 	function init() {
 	  ctx.clearRect(0, 0, canvas.width, canvas.height);
 	  ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-	  field.drawLine();
+
 	  field.drawScore();
 	  field._populateNextBricks();
 	  field.createNewBrick();
 	  field._addBrickToField();
 	  field.drawNextBricks();
 	  field.drawField();
+	  field.drawLine();
 	  field.autoMoveBricks();
 	  field.moveLine();
 	  setTimeout(function(){
@@ -112,7 +113,7 @@
 	      for (let j = 0; j < this.width; j++) {
 	        if (!this.grid[i][j] && i > 1) {
 	          ctx.beginPath();
-	          ctx.strokeStyle = 'black';
+	          ctx.strokeStyle = '#E6E6FA';
 	          ctx.rect((this.leftOffset + (j * this.cellSize)),
 	          (this.topOffset + (i * this.cellSize)), this.cellSize, this.cellSize);
 	          ctx.stroke();
@@ -120,18 +121,18 @@
 	        }
 	        else if (this.grid[i][j]) {
 	          ctx.beginPath();
-	          ctx.strokeStyle = 'black';
+	          ctx.strokeStyle = '#E6E6FA';
 	          // if (this.grid[i][j].markedForDeletion) {
 	          //   ctx.fillStyle = 'purple';
 	          // }
 	          if (this.grid[i][j].color === 1 && !this.grid[i][j].markedForDeletion) {
-	            ctx.fillStyle = 'red';
+	            ctx.fillStyle = 'orange';
 	          }
 	          else if (this.grid[i][j].color === 1 && this.grid[i][j].markedForDeletion) {
-	            ctx.fillStyle = '#EE82EE';
+	            ctx.fillStyle = '#FF4500';
 	          }
 	          else if (this.grid[i][j].color === 2 && !this.grid[i][j].markedForDeletion) {
-	            ctx.fillStyle = 'blue';
+	            ctx.fillStyle = 'white';
 	          }
 	          else if (this.grid[i][j].color === 2 && this.grid[i][j].markedForDeletion) {
 	            ctx.fillStyle = '#1E90FF';
@@ -158,9 +159,9 @@
 	        (m < 2) ? i = 0 : i = 1;
 	        (m % 2 === 0) ? j = 0 : j = 1;
 	        ctx.beginPath();
-	        ctx.strokeStyle = 'black';
+	        ctx.strokeStyle = 'E6E6FA';
 	        // console.log(brick);
-	        (brick.all[m].color === 1) ? ctx.fillStyle = 'red' : ctx.fillStyle = 'blue';
+	        (brick.all[m].color === 1) ? ctx.fillStyle = 'orange' : ctx.fillStyle = 'white';
 	        ctx.rect((this.nextBricksLeftOffset + i * 30),
 	                (this.topOffset + (offset * k) + (j * 30)),
 	                this.cellSize,
@@ -193,7 +194,7 @@
 	  //draw the line which moves across the field
 	  this.drawLine = function() {
 	    ctx.beginPath();
-	    ctx.strokeStyle = 'purple';
+	    ctx.strokeStyle = 'white';
 	    ctx.moveTo(this.lineX, 120);
 	    ctx.lineWidth = 5;
 	    ctx.lineTo(this.lineX, 420);

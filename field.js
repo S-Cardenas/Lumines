@@ -40,10 +40,13 @@ function Field(canvas) {
         else if (this.grid[i][j]) {
           ctx.beginPath();
           ctx.strokeStyle = 'black';
-          if (this.grid[i][j].color === 1) {
+          if (this.grid[i][j].markedForDeletion) {
+            ctx.fillStyle = 'purple';
+          }
+          else if (this.grid[i][j].color === 1) {
             ctx.fillStyle = 'red';
           }
-          else {
+          else if (this.grid[i][j].color === 2) {
             ctx.fillStyle = 'blue';
           }
           ctx.rect((this.leftOffset + (this.grid[i][j].x * this.cellSize)),
@@ -112,9 +115,14 @@ function Field(canvas) {
     ctx.closePath();
   };
 
-  //move the line
+  //move the line across the field
   this.moveLine = function() {
-    if (this.lineX >= 600) {this.lineX = 120;}
+    this._checkBlocksForDeletion();
+    if (this.lineX >= 600) {
+
+      this._deleteBlocks();
+      this.lineX = 120;
+    }
     else {this.lineX += 20;}
   };
 
@@ -151,19 +159,19 @@ function Field(canvas) {
     }
   };
 
-  //automatically move the bricks;
+  //automatically move the bricks/blocks
   this.autoMoveBricks = function() {
+    //check if the active brick has stopped moving and inactivate it
     if (this.activeBrick._stoppedMoving(this.grid)) {
       this.activeBrick._setBlocksInactive();
       this.activeBrick = undefined;
-      this._checkBlocksForDeletion();
-      this._deleteBlocks();
     }
+    //first move the activeBrick (the one that the user can control)
+    //then move the inactive bricks/blocks
     if (this.activeBrick) {
       this.grid = this.activeBrick.autoMove(this.grid);
       //automove each individual block
-      //CHANGE THIS TO AUTO MOVE THE BRICKS FROM THE BOTTOM TO THE TOP!!!!!
-      for (let i = 2; i < this.height - 1; i++) {
+      for (let i = (this.height - 1); i > 1; i--) {
         for (let j = 0; j < this.width; j++) {
           if (this.grid[i][j] !== 0 && !this.grid[i][j].active) {
             this.grid = this.grid[i][j]._autoMove(this.grid);
@@ -171,8 +179,6 @@ function Field(canvas) {
         }
       }
     }
-    // this._checkBlocksForDeletion();
-    // this._deleteBlocks();
   };
 
   //check which blocks need to be deleted
@@ -180,7 +186,7 @@ function Field(canvas) {
     for (let i = 2; i < this.height - 1; i++) {
       for (let j = 0; j < this.width - 1; j++) {
         if (this.grid[i][j] !== 0 && !this.grid[i][j].active) {
-          this.grid[i][j].updateDeletionStatus(this.grid);
+          this.grid[i][j].updateDeletionStatus(this.grid, this.lineX);
         }
       }
     }
@@ -192,11 +198,6 @@ function Field(canvas) {
     for (let i = 2; i < this.height; i++) {
       for (let j = 0; j < this.width; j++) {
         let block = this.grid[i][j];
-        let lineConversion = ((11/480) * this.lineX) - (11/4);
-        // if (block.markedForDeletion && (lineConversion >= block.x + 1)) {
-        //   tempScore += 1;
-        //   this.grid[i][j] = 0;
-        // }
         if (block.markedForDeletion) {
           tempScore += 1;
           this.grid[i][j] = 0;

@@ -49,7 +49,7 @@
 	var canvas = document.getElementById('myCanvas');
 	var ctx = canvas.getContext("2d");
 	var field = new Field(canvas);
-	var fps = 5;
+	var fps = 6;
 
 	document.addEventListener("keydown", field.keyDownHandler.bind(field), false);
 
@@ -119,10 +119,13 @@
 	        else if (this.grid[i][j]) {
 	          ctx.beginPath();
 	          ctx.strokeStyle = 'black';
-	          if (this.grid[i][j].color === 1) {
+	          if (this.grid[i][j].markedForDeletion) {
+	            ctx.fillStyle = 'purple';
+	          }
+	          else if (this.grid[i][j].color === 1) {
 	            ctx.fillStyle = 'red';
 	          }
-	          else {
+	          else if (this.grid[i][j].color === 2) {
 	            ctx.fillStyle = 'blue';
 	          }
 	          ctx.rect((this.leftOffset + (this.grid[i][j].x * this.cellSize)),
@@ -191,9 +194,14 @@
 	    ctx.closePath();
 	  };
 
-	  //move the line
+	  //move the line across the field
 	  this.moveLine = function() {
-	    if (this.lineX >= 600) {this.lineX = 120;}
+	    this._checkBlocksForDeletion();
+	    if (this.lineX >= 600) {
+
+	      this._deleteBlocks();
+	      this.lineX = 120;
+	    }
 	    else {this.lineX += 20;}
 	  };
 
@@ -230,19 +238,19 @@
 	    }
 	  };
 
-	  //automatically move the bricks;
+	  //automatically move the bricks/blocks
 	  this.autoMoveBricks = function() {
+	    //check if the active brick has stopped moving and inactivate it
 	    if (this.activeBrick._stoppedMoving(this.grid)) {
 	      this.activeBrick._setBlocksInactive();
 	      this.activeBrick = undefined;
-	      this._checkBlocksForDeletion();
-	      this._deleteBlocks();
 	    }
+	    //first move the activeBrick (the one that the user can control)
+	    //then move the inactive bricks/blocks
 	    if (this.activeBrick) {
 	      this.grid = this.activeBrick.autoMove(this.grid);
 	      //automove each individual block
-	      //CHANGE THIS TO AUTO MOVE THE BRICKS FROM THE BOTTOM TO THE TOP!!!!!
-	      for (let i = 2; i < this.height - 1; i++) {
+	      for (let i = (this.height - 1); i > 1; i--) {
 	        for (let j = 0; j < this.width; j++) {
 	          if (this.grid[i][j] !== 0 && !this.grid[i][j].active) {
 	            this.grid = this.grid[i][j]._autoMove(this.grid);
@@ -250,8 +258,6 @@
 	        }
 	      }
 	    }
-	    // this._checkBlocksForDeletion();
-	    // this._deleteBlocks();
 	  };
 
 	  //check which blocks need to be deleted
@@ -259,7 +265,7 @@
 	    for (let i = 2; i < this.height - 1; i++) {
 	      for (let j = 0; j < this.width - 1; j++) {
 	        if (this.grid[i][j] !== 0 && !this.grid[i][j].active) {
-	          this.grid[i][j].updateDeletionStatus(this.grid);
+	          this.grid[i][j].updateDeletionStatus(this.grid, this.lineX);
 	        }
 	      }
 	    }
@@ -271,11 +277,6 @@
 	    for (let i = 2; i < this.height; i++) {
 	      for (let j = 0; j < this.width; j++) {
 	        let block = this.grid[i][j];
-	        let lineConversion = ((11/480) * this.lineX) - (11/4);
-	        // if (block.markedForDeletion && (lineConversion >= block.x + 1)) {
-	        //   tempScore += 1;
-	        //   this.grid[i][j] = 0;
-	        // }
 	        if (block.markedForDeletion) {
 	          tempScore += 1;
 	          this.grid[i][j] = 0;
@@ -600,21 +601,25 @@
 	  };
 
 	  // check if current block makes a same-color square in the grid
-	  this.updateDeletionStatus = function(grid) {
+	  this.updateDeletionStatus = function(grid, lineX) {
 	    let status = true;
-	    for (let i = 0; i < 2; i++) {
-	      for (let j = 0; j < 2; j++) {
-	        if (i === 0 && j === 0) {continue;}
-	        else if (this.color !== grid[this.y + i][this.x + j].color || !grid[this.y + i][this.x + j]._stoppedMoving(grid)) {
-	          status = false;
-	          break;
-	        }
-	      }
-	    }
-	    if (status) {
+	    let lineConversion = ((1/32) * lineX) - (15/4);
+	    console.log(lineConversion);
+	    if (lineConversion >= this.x && lineConversion <= this.x + 1) {
 	      for (let i = 0; i < 2; i++) {
 	        for (let j = 0; j < 2; j++) {
-	          grid[this.y + i][this.x + j].markedForDeletion = true;
+	          if (i === 0 && j === 0) {continue;}
+	          else if (this.color !== grid[this.y + i][this.x + j].color || !grid[this.y + i][this.x + j]._stoppedMoving(grid)) {
+	            status = false;
+	            break;
+	          }
+	        }
+	      }
+	      if (status) {
+	        for (let i = 0; i < 2; i++) {
+	          for (let j = 0; j < 2; j++) {
+	            grid[this.y + i][this.x + j].markedForDeletion = true;
+	          }
 	        }
 	      }
 	    }

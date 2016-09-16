@@ -3,7 +3,7 @@ const Field = require('./field');
 var canvas = document.getElementById('myCanvas');
 var ctx = canvas.getContext("2d");
 var field = new Field(canvas);
-var fps = 5;
+var fps = 6;
 
 document.addEventListener("keydown", field.keyDownHandler.bind(field), false);
 

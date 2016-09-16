@@ -84,21 +84,25 @@ function Block() {
   };
 
   // check if current block makes a same-color square in the grid
-  this.updateDeletionStatus = function(grid) {
+  this.updateDeletionStatus = function(grid, lineX) {
     let status = true;
-    for (let i = 0; i < 2; i++) {
-      for (let j = 0; j < 2; j++) {
-        if (i === 0 && j === 0) {continue;}
-        else if (this.color !== grid[this.y + i][this.x + j].color || !grid[this.y + i][this.x + j]._stoppedMoving(grid)) {
-          status = false;
-          break;
-        }
-      }
-    }
-    if (status) {
+    let lineConversion = ((1/32) * lineX) - (15/4);
+    console.log(lineConversion);
+    if (lineConversion >= this.x && lineConversion <= this.x + 1) {
       for (let i = 0; i < 2; i++) {
         for (let j = 0; j < 2; j++) {
-          grid[this.y + i][this.x + j].markedForDeletion = true;
+          if (i === 0 && j === 0) {continue;}
+          else if (this.color !== grid[this.y + i][this.x + j].color || !grid[this.y + i][this.x + j]._stoppedMoving(grid)) {
+            status = false;
+            break;
+          }
+        }
+      }
+      if (status) {
+        for (let i = 0; i < 2; i++) {
+          for (let j = 0; j < 2; j++) {
+            grid[this.y + i][this.x + j].markedForDeletion = true;
+          }
         }
       }
     }

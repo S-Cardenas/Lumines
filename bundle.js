@@ -159,7 +159,7 @@
 	        (m < 2) ? i = 0 : i = 1;
 	        (m % 2 === 0) ? j = 0 : j = 1;
 	        ctx.beginPath();
-	        ctx.strokeStyle = 'E6E6FA';
+	        ctx.strokeStyle = '#E6E6FA';
 	        (brick.all[m].color === 1) ? ctx.fillStyle = 'orange' : ctx.fillStyle = 'white';
 	        ctx.rect((this.nextBricksLeftOffset + i * 30),
 	                (this.topOffset + (offset * k) + (j * 30)),

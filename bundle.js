@@ -119,14 +119,20 @@
 	        else if (this.grid[i][j]) {
 	          ctx.beginPath();
 	          ctx.strokeStyle = 'black';
-	          if (this.grid[i][j].markedForDeletion) {
-	            ctx.fillStyle = 'purple';
-	          }
-	          else if (this.grid[i][j].color === 1) {
+	          // if (this.grid[i][j].markedForDeletion) {
+	          //   ctx.fillStyle = 'purple';
+	          // }
+	          if (this.grid[i][j].color === 1 && !this.grid[i][j].markedForDeletion) {
 	            ctx.fillStyle = 'red';
 	          }
-	          else if (this.grid[i][j].color === 2) {
+	          else if (this.grid[i][j].color === 1 && this.grid[i][j].markedForDeletion) {
+	            ctx.fillStyle = '#EE82EE';
+	          }
+	          else if (this.grid[i][j].color === 2 && !this.grid[i][j].markedForDeletion) {
 	            ctx.fillStyle = 'blue';
+	          }
+	          else if (this.grid[i][j].color === 2 && this.grid[i][j].markedForDeletion) {
+	            ctx.fillStyle = '#1E90FF';
 	          }
 	          ctx.rect((this.leftOffset + (this.grid[i][j].x * this.cellSize)),
 	            (this.topOffset + (this.grid[i][j].y * this.cellSize)),

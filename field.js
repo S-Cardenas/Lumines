@@ -78,7 +78,6 @@ function Field(canvas) {
         (m % 2 === 0) ? j = 0 : j = 1;
         ctx.beginPath();
         ctx.strokeStyle = 'E6E6FA';
-        // console.log(brick);
         (brick.all[m].color === 1) ? ctx.fillStyle = 'orange' : ctx.fillStyle = 'white';
         ctx.rect((this.nextBricksLeftOffset + i * 30),
                 (this.topOffset + (offset * k) + (j * 30)),
@@ -96,14 +95,14 @@ function Field(canvas) {
     //draw the score title
     ctx.beginPath();
     ctx.font = "30px serif";
-    ctx.fillStyle = 'black';
+    ctx.fillStyle = 'white';
     ctx.fillText('Score:', 630, 120);
     ctx.closePath();
 
     //draw the score value
     ctx.beginPath();
     ctx.font = "30px serif";
-    ctx.fillStyle = 'black';
+    ctx.fillStyle = 'white';
     ctx.fillText(this.score, 630, 160);
     ctx.closePath();
 
@@ -113,11 +112,20 @@ function Field(canvas) {
   this.drawLine = function() {
     ctx.beginPath();
     ctx.strokeStyle = 'white';
-    ctx.moveTo(this.lineX, 120);
+    ctx.moveTo(this.lineX, 106);
     ctx.lineWidth = 5;
     ctx.lineTo(this.lineX, 420);
     ctx.stroke();
     ctx.lineWidth = 1;
+    ctx.closePath();
+
+    //draw the top triangle
+    ctx.beginPath();
+    ctx.fillStyle = 'white';
+    ctx.moveTo(this.lineX, 120);
+    ctx.lineTo(this.lineX + 15, 112.5);
+    ctx.lineTo(this.lineX, 105);
+    ctx.fill();
     ctx.closePath();
   };
 

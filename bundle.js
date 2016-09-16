@@ -160,7 +160,6 @@
 	        (m % 2 === 0) ? j = 0 : j = 1;
 	        ctx.beginPath();
 	        ctx.strokeStyle = 'E6E6FA';
-	        // console.log(brick);
 	        (brick.all[m].color === 1) ? ctx.fillStyle = 'orange' : ctx.fillStyle = 'white';
 	        ctx.rect((this.nextBricksLeftOffset + i * 30),
 	                (this.topOffset + (offset * k) + (j * 30)),
@@ -178,14 +177,14 @@
 	    //draw the score title
 	    ctx.beginPath();
 	    ctx.font = "30px serif";
-	    ctx.fillStyle = 'black';
+	    ctx.fillStyle = 'white';
 	    ctx.fillText('Score:', 630, 120);
 	    ctx.closePath();
 
 	    //draw the score value
 	    ctx.beginPath();
 	    ctx.font = "30px serif";
-	    ctx.fillStyle = 'black';
+	    ctx.fillStyle = 'white';
 	    ctx.fillText(this.score, 630, 160);
 	    ctx.closePath();
 
@@ -195,11 +194,20 @@
 	  this.drawLine = function() {
 	    ctx.beginPath();
 	    ctx.strokeStyle = 'white';
-	    ctx.moveTo(this.lineX, 120);
+	    ctx.moveTo(this.lineX, 106);
 	    ctx.lineWidth = 5;
 	    ctx.lineTo(this.lineX, 420);
 	    ctx.stroke();
 	    ctx.lineWidth = 1;
+	    ctx.closePath();
+
+	    //draw the top triangle
+	    ctx.beginPath();
+	    ctx.fillStyle = 'white';
+	    ctx.moveTo(this.lineX, 120);
+	    ctx.lineTo(this.lineX + 15, 112.5);
+	    ctx.lineTo(this.lineX, 105);
+	    ctx.fill();
 	    ctx.closePath();
 	  };
 
@@ -613,7 +621,6 @@
 	  this.updateDeletionStatus = function(grid, lineX) {
 	    let status = true;
 	    let lineConversion = ((1/32) * lineX) - (15/4);
-	    console.log(lineConversion);
 	    if (lineConversion >= this.x && lineConversion <= this.x + 1) {
 	      for (let i = 0; i < 2; i++) {
 	        for (let j = 0; j < 2; j++) {

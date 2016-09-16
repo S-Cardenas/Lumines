@@ -87,7 +87,6 @@ function Block() {
   this.updateDeletionStatus = function(grid, lineX) {
     let status = true;
     let lineConversion = ((1/32) * lineX) - (15/4);
-    console.log(lineConversion);
     if (lineConversion >= this.x && lineConversion <= this.x + 1) {
       for (let i = 0; i < 2; i++) {
         for (let j = 0; j < 2; j++) {

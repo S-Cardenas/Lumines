@@ -38,25 +38,26 @@ function Field(canvas) {
           ctx.closePath();
         }
         else if (this.grid[i][j]) {
+          let block = this.grid[i][j];
           ctx.beginPath();
           ctx.strokeStyle = '#E6E6FA';
           // if (this.grid[i][j].markedForDeletion) {
           //   ctx.fillStyle = 'purple';
           // }
-          if (this.grid[i][j].color === 1 && !this.grid[i][j].markedForDeletion) {
+          if (block.color === 1 && !block.markedForDeletion) {
             ctx.fillStyle = 'orange';
           }
-          else if (this.grid[i][j].color === 1 && this.grid[i][j].markedForDeletion) {
+          else if (block.color === 1 && block.markedForDeletion) {
             ctx.fillStyle = '#FF4500';
           }
-          else if (this.grid[i][j].color === 2 && !this.grid[i][j].markedForDeletion) {
+          else if (block.color === 2 && !block.markedForDeletion) {
             ctx.fillStyle = 'white';
           }
-          else if (this.grid[i][j].color === 2 && this.grid[i][j].markedForDeletion) {
+          else if (block.color === 2 && block.markedForDeletion) {
             ctx.fillStyle = '#1E90FF';
           }
-          ctx.rect((this.leftOffset + (this.grid[i][j].x * this.cellSize)),
-            (this.topOffset + (this.grid[i][j].y * this.cellSize)),
+          ctx.rect((this.leftOffset + (block.x * this.cellSize)),
+            (this.topOffset + (block.y * this.cellSize)),
             this.cellSize, this.cellSize);
           ctx.stroke();
           ctx.fill();

@@ -49,13 +49,15 @@
 	var canvas = document.getElementById('myCanvas');
 	var ctx = canvas.getContext("2d");
 	var field = new Field(canvas);
+	var img = new Image();
+	img.src = './background.jpg';
 	var fps = 6;
 
 	document.addEventListener("keydown", field.keyDownHandler.bind(field), false);
 
 	function init() {
 	  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
+	  ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 	  field.drawLine();
 	  field.drawScore();
 	  field._populateNextBricks();

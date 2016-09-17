@@ -97,7 +97,9 @@
 	  this.nextBricks = [];
 	  this.spacePressed = false;
 	  this.score = 0;
-	  this.lineX = 120;
+	  this.lineX = 120; // X coordinate of the clearing line
+	  this.level = Math.floor(Math.random() * (5 - 0 + 1)) + 0; // Line speed
+	  this.lineSweeps = 0; //Counts the number of line sweeps
 	  let ctx = canvas.getContext('2d');
 
 	  //Initialize the field as empty
@@ -195,6 +197,19 @@
 	    ctx.fillText(this.score, 630, 160);
 	    ctx.closePath();
 
+	    //draw the level title
+	    ctx.beginPath();
+	    ctx.font = "30px serif";
+	    ctx.fillStyle = 'white';
+	    ctx.fillText('Speed', 630, 200);
+	    ctx.closePath();
+
+	    //draw the level value
+	    ctx.beginPath();
+	    ctx.font = "30px serif";
+	    ctx.fillStyle = 'white';
+	    ctx.fillText(this.level, 630, 240);
+	    ctx.closePath();
 	  };
 
 	  //draw the line which moves across the field
@@ -222,11 +237,14 @@
 	  this.moveLine = function() {
 	    this._checkBlocksForDeletion();
 	    if (this.lineX >= 600) {
-
 	      this._deleteBlocks();
+	      this.lineSweeps++;
+	      if (this.lineSweeps % 3 === 0) {
+	        this.level = Math.floor(Math.random() * (5 - 0 + 1)) + 0;
+	      }
 	      this.lineX = 120;
 	    }
-	    else {this.lineX += 5;}
+	    else {this.lineX += 2 + this.level;}
 	  };
 
 	  //Create a new active brick if there is none

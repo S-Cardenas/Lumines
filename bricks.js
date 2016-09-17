@@ -11,7 +11,9 @@ function Bricks() {
     for (let j = 0; j < 2; j++) {
       let block = new Block();
       block.x = (this.gridWidth / 2) + i;
-      block.y = j;
+      block.xV = (this.gridWidth / 2) + i;
+      block.y = j; // y is the location on the grid
+      block.yV = j; //yV is the pixel location in Canvas
       block.color = Math.floor(Math.random() * (3 - 1)) + 1;
       this.all.push(block);
     }
@@ -113,7 +115,7 @@ function Bricks() {
     let x = block.x,
         y = block.y;
     for (let i = y + 1; i < this.gridHeight; i++) {
-      if (grid[i][x] !== 0) {return i;}
+      if (grid[i][x] !== 0) {return grid[i][x];}
     }
     return false;
   };
@@ -125,7 +127,9 @@ function Bricks() {
     switch(key) {
       case 1:
         //block is just falling vertically by one position
-        block.y++;
+        block.yV += 0.25;
+        if (block.yV % 1 === 0) {block.y++;}
+        // block.y++ ;
         grid[block.y][block.x] = block;
         grid[oldY][oldX] = 0;
         break;
@@ -133,19 +137,22 @@ function Bricks() {
         //there is a block below current block. move current block on top of
         //block below.
         let existingBlockY = this._nextBlockY(block, grid);
-        block.y += (existingBlockY - block.y - 1);
+        block.y += (existingBlockY.y - block.y - 1);
+        block.yV = block.y + (existingBlockY.yV - existingBlockY.y);
         grid[block.y][block.x] = block;
         grid[oldY][oldX] = 0;
         break;
       case 3:
         //block is incrementing at a rate of 3 vertical locations
-        block.y += 3;
+        block.y += 1;
+        block.yV += 1;
         grid[block.y][block.x] = block;
         grid[oldY][oldX] = 0;
         break;
       case 4:
         //block is moving to the bottom of the grid
         block.y += ((this.gridHeight - 1) - block.y);
+        block.yV = block.y;
         grid[block.y][block.x] = block;
         grid[oldY][oldX] = 0;
         break;

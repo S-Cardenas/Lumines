@@ -5,7 +5,7 @@ var ctx = canvas.getContext("2d");
 var field = new Field(canvas);
 var img = new Image();
 img.src = './background.jpg';
-var fps = 6;
+var fps = 15;
 
 document.addEventListener("keydown", field.keyDownHandler.bind(field), false);
 
@@ -19,6 +19,7 @@ function init() {
   field._addBrickToField();
   field.drawNextBricks();
   field.drawField();
+  field.drawBlocks();
   field.drawLine();
   field.autoMoveBricks();
   field.moveLine();

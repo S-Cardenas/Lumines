@@ -2,7 +2,9 @@ function Block() {
   this.gridWidth = 16;
   this.gridHeight = 12;
   this.x = undefined;
-  this.y = undefined;
+  this.y = undefined; // y is the location on the grid
+  this.xV = undefined; //yV is the pixel location in Canvas
+  this.yV = undefined;
   this.color = undefined;
   this.active = true;
   this.markedForDeletion = false;
@@ -31,18 +33,21 @@ function Block() {
         // there is a block below current block. Move on top of it
         let existingBlockY = this._nextBlockY(grid);
         this.y += (existingBlockY - this.y - 1);
+        this.yV = this.y;
         grid[this.y][this.x] = this;
         grid[oldY][oldX] = 0;
         break;
       case 3:
         //block is incrementing at a rate of 4 vertical locations
-        this.y += 4;
+        this.y += 1;
+        this.yV = this.y;
         grid[this.y][this.x] = this;
         grid[oldY][oldX] = 0;
         break;
       case 4:
         //block is to be moved to the bottom of the grid
         this.y += ((this.gridHeight - 1) - this.y);
+        this.yV = this.y;
         grid[this.y][this.x] = this;
         grid[oldY][oldX] = 0;
         break;

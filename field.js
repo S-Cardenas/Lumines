@@ -25,11 +25,11 @@ function Field(canvas) {
     }
   }
 
-  //Draw the field
+  //Draw the field grid
   this.drawField = function() {
     for (let i = 0; i < this.height; i++) {
       for (let j = 0; j < this.width; j++) {
-        if (!this.grid[i][j] && i > 1) {
+        if (i > 1) {
           ctx.beginPath();
           ctx.strokeStyle = '#E6E6FA';
           ctx.rect((this.leftOffset + (j * this.cellSize)),
@@ -37,13 +37,18 @@ function Field(canvas) {
           ctx.stroke();
           ctx.closePath();
         }
-        else if (this.grid[i][j]) {
+      }
+    }
+  };
+
+  //draw the blocks
+  this.drawBlocks = function() {
+    for (let i = 0; i < this.height; i++) {
+      for (let j = 0; j < this.width; j++) {
+        if (this.grid[i][j]) {
           let block = this.grid[i][j];
           ctx.beginPath();
           ctx.strokeStyle = '#E6E6FA';
-          // if (this.grid[i][j].markedForDeletion) {
-          //   ctx.fillStyle = 'purple';
-          // }
           if (block.color === 1 && !block.markedForDeletion) {
             ctx.fillStyle = 'orange';
           }
@@ -57,7 +62,7 @@ function Field(canvas) {
             ctx.fillStyle = '#1E90FF';
           }
           ctx.rect((this.leftOffset + (block.x * this.cellSize)),
-            (this.topOffset + (block.y * this.cellSize)),
+            (this.topOffset + (block.yV * this.cellSize)),
             this.cellSize, this.cellSize);
           ctx.stroke();
           ctx.fill();
@@ -138,7 +143,7 @@ function Field(canvas) {
       this._deleteBlocks();
       this.lineX = 120;
     }
-    else {this.lineX += 20;}
+    else {this.lineX += 5;}
   };
 
   //Create a new active brick if there is none

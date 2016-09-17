@@ -51,7 +51,7 @@
 	var field = new Field(canvas);
 	var img = new Image();
 	img.src = './background.jpg';
-	var fps = 6;
+	var fps = 15;
 
 	document.addEventListener("keydown", field.keyDownHandler.bind(field), false);
 
@@ -65,6 +65,7 @@
 	  field._addBrickToField();
 	  field.drawNextBricks();
 	  field.drawField();
+	  field.drawBlocks();
 	  field.drawLine();
 	  field.autoMoveBricks();
 	  field.moveLine();
@@ -107,11 +108,11 @@
 	    }
 	  }
 
-	  //Draw the field
+	  //Draw the field grid
 	  this.drawField = function() {
 	    for (let i = 0; i < this.height; i++) {
 	      for (let j = 0; j < this.width; j++) {
-	        if (!this.grid[i][j] && i > 1) {
+	        if (i > 1) {
 	          ctx.beginPath();
 	          ctx.strokeStyle = '#E6E6FA';
 	          ctx.rect((this.leftOffset + (j * this.cellSize)),
@@ -119,13 +120,18 @@
 	          ctx.stroke();
 	          ctx.closePath();
 	        }
-	        else if (this.grid[i][j]) {
+	      }
+	    }
+	  };
+
+	  //draw the blocks
+	  this.drawBlocks = function() {
+	    for (let i = 0; i < this.height; i++) {
+	      for (let j = 0; j < this.width; j++) {
+	        if (this.grid[i][j]) {
 	          let block = this.grid[i][j];
 	          ctx.beginPath();
 	          ctx.strokeStyle = '#E6E6FA';
-	          // if (this.grid[i][j].markedForDeletion) {
-	          //   ctx.fillStyle = 'purple';
-	          // }
 	          if (block.color === 1 && !block.markedForDeletion) {
 	            ctx.fillStyle = 'orange';
 	          }
@@ -139,7 +145,7 @@
 	            ctx.fillStyle = '#1E90FF';
 	          }
 	          ctx.rect((this.leftOffset + (block.x * this.cellSize)),
-	            (this.topOffset + (block.y * this.cellSize)),
+	            (this.topOffset + (block.yV * this.cellSize)),
 	            this.cellSize, this.cellSize);
 	          ctx.stroke();
 	          ctx.fill();
@@ -220,7 +226,7 @@
 	      this._deleteBlocks();
 	      this.lineX = 120;
 	    }
-	    else {this.lineX += 20;}
+	    else {this.lineX += 5;}
 	  };
 
 	  //Create a new active brick if there is none
@@ -327,7 +333,9 @@
 	    for (let j = 0; j < 2; j++) {
 	      let block = new Block();
 	      block.x = (this.gridWidth / 2) + i;
-	      block.y = j;
+	      block.xV = (this.gridWidth / 2) + i;
+	      block.y = j; // y is the location on the grid
+	      block.yV = j; //yV is the pixel location in Canvas
 	      block.color = Math.floor(Math.random() * (3 - 1)) + 1;
 	      this.all.push(block);
 	    }
@@ -429,7 +437,7 @@
 	    let x = block.x,
 	        y = block.y;
 	    for (let i = y + 1; i < this.gridHeight; i++) {
-	      if (grid[i][x] !== 0) {return i;}
+	      if (grid[i][x] !== 0) {return grid[i][x];}
 	    }
 	    return false;
 	  };
@@ -441,7 +449,9 @@
 	    switch(key) {
 	      case 1:
 	        //block is just falling vertically by one position
-	        block.y++;
+	        block.yV += 0.25;
+	        if (block.yV % 1 === 0) {block.y++;}
+	        // block.y++ ;
 	        grid[block.y][block.x] = block;
 	        grid[oldY][oldX] = 0;
 	        break;
@@ -449,19 +459,22 @@
 	        //there is a block below current block. move current block on top of
 	        //block below.
 	        let existingBlockY = this._nextBlockY(block, grid);
-	        block.y += (existingBlockY - block.y - 1);
+	        block.y += (existingBlockY.y - block.y - 1);
+	        block.yV = block.y + (existingBlockY.yV - existingBlockY.y);
 	        grid[block.y][block.x] = block;
 	        grid[oldY][oldX] = 0;
 	        break;
 	      case 3:
 	        //block is incrementing at a rate of 3 vertical locations
-	        block.y += 3;
+	        block.y += 1;
+	        block.yV += 1;
 	        grid[block.y][block.x] = block;
 	        grid[oldY][oldX] = 0;
 	        break;
 	      case 4:
 	        //block is moving to the bottom of the grid
 	        block.y += ((this.gridHeight - 1) - block.y);
+	        block.yV = block.y;
 	        grid[block.y][block.x] = block;
 	        grid[oldY][oldX] = 0;
 	        break;
@@ -537,7 +550,9 @@
 	  this.gridWidth = 16;
 	  this.gridHeight = 12;
 	  this.x = undefined;
-	  this.y = undefined;
+	  this.y = undefined; // y is the location on the grid
+	  this.xV = undefined; //yV is the pixel location in Canvas
+	  this.yV = undefined;
 	  this.color = undefined;
 	  this.active = true;
 	  this.markedForDeletion = false;
@@ -566,18 +581,21 @@
 	        // there is a block below current block. Move on top of it
 	        let existingBlockY = this._nextBlockY(grid);
 	        this.y += (existingBlockY - this.y - 1);
+	        this.yV = this.y;
 	        grid[this.y][this.x] = this;
 	        grid[oldY][oldX] = 0;
 	        break;
 	      case 3:
 	        //block is incrementing at a rate of 4 vertical locations
-	        this.y += 4;
+	        this.y += 1;
+	        this.yV = this.y;
 	        grid[this.y][this.x] = this;
 	        grid[oldY][oldX] = 0;
 	        break;
 	      case 4:
 	        //block is to be moved to the bottom of the grid
 	        this.y += ((this.gridHeight - 1) - this.y);
+	        this.yV = this.y;
 	        grid[this.y][this.x] = this;
 	        grid[oldY][oldX] = 0;
 	        break;

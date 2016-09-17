@@ -46,12 +46,14 @@
 
 	const Field = __webpack_require__(1);
 
-	var canvas = document.getElementById('myCanvas');
-	var ctx = canvas.getContext("2d");
-	var field = new Field(canvas);
-	var img = new Image();
+	var canvas = document.getElementById('myCanvas'),
+	    ctx = canvas.getContext("2d"),
+	    field = new Field(canvas),
+	    img = new Image(),
+	    pause = true,
+	    fps = 15;
+
 	img.src = './background.jpg';
-	var fps = 15;
 
 	document.addEventListener("keydown", field.keyDownHandler.bind(field), false);
 
@@ -67,12 +69,22 @@
 	  field.drawField();
 	  field.drawBlocks();
 	  field.drawLine();
+	  // if (pause) {
+	  //   return;
+	  // }
 	  field.autoMoveBricks();
 	  field.moveLine();
 	  setTimeout(function(){
 	    requestAnimationFrame(init);}, 1000 / fps);
 
 	}
+
+	// ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+	// $('#menu').click(function() {
+	//   $(this).attr("id", "noMenu");
+	//   pause = false;
+	//   init();
+	// });
 
 	init();
 
@@ -433,7 +445,13 @@
 
 	  // check if block is at bottom
 	  this._atBottom = function(block) {
-	    if (block.y > 10) {return true;}
+	    console.log(block.y);
+	    if (block.y > 10) {
+
+	      console.log('at bottom');
+	      return true;
+	    }
+
 	    return false;
 	  };
 
@@ -467,9 +485,8 @@
 	    switch(key) {
 	      case 1:
 	        //block is just falling vertically by one position
-	        block.yV += 0.25;
-	        if (block.yV % 1 === 0) {block.y++;}
-	        // block.y++ ;
+	        block.yV += 0.1;
+	        if (block.yV.toFixed(2) % 1 === 0) {block.y++;}
 	        grid[block.y][block.x] = block;
 	        grid[oldY][oldX] = 0;
 	        break;

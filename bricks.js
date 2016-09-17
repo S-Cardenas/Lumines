@@ -93,7 +93,13 @@ function Bricks() {
 
   // check if block is at bottom
   this._atBottom = function(block) {
-    if (block.y > 10) {return true;}
+    console.log(block.y);
+    if (block.y > 10) {
+
+      console.log('at bottom');
+      return true;
+    }
+
     return false;
   };
 
@@ -127,9 +133,8 @@ function Bricks() {
     switch(key) {
       case 1:
         //block is just falling vertically by one position
-        block.yV += 0.25;
-        if (block.yV % 1 === 0) {block.y++;}
-        // block.y++ ;
+        block.yV += 0.1;
+        if (block.yV.toFixed(2) % 1 === 0) {block.y++;}
         grid[block.y][block.x] = block;
         grid[oldY][oldX] = 0;
         break;

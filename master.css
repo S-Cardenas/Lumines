@@ -1,0 +1,55 @@
+* {
+  padding: 0; margin: 0
+}
+
+canvas {
+  background: #eee;
+  display: block;
+  margin: 0 auto;
+}
+
+.menu {
+  position: absolute;
+  color: white;
+  font-family: "Comic Sans MS", cursive, sans-serif;
+  background: url("./00.-Early-Version.jpg");
+  background-size: cover;
+  display: block;
+  left: 50%;
+  transform: translate(-50%, 0);
+  width: 740px;
+  height: 480px;
+  margin: auto;
+}
+
+.menu p {
+  white-space: pre;
+  /*background: blue;*/
+  font-size: 20px;
+  width: fit-content;
+  margin: 0 auto;
+}
+
+.menu h1 {
+  margin: 30px auto;
+  color: yellow;
+  /*background: blue;*/
+  width: fit-content;
+}
+
+.play-button {
+  color: purple;
+  background: yellow;
+  font-size: 55px;
+  margin-left: 40%;
+  border-radius: 10px;
+}
+
+.play-button:hover {
+  background: purple;
+  color: yellow;
+}
+
+.noMenu {
+  display: none;
+}

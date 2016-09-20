@@ -14,6 +14,7 @@ function Field(canvas) {
   this.nextBricks = [];
   this.spacePressed = false;
   this.score = 0;
+  this.paused = true;
   this.lineX = 120; // X coordinate of the clearing line
   this.level = Math.floor(Math.random() * (5 - 0 + 1)) + 0; // Line speed
   this.lineSweeps = 0; //Counts the number of line sweeps

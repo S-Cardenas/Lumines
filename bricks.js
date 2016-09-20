@@ -65,7 +65,6 @@ function Bricks() {
     for (let i = 0; i < order.length; i++) {
       let block  = this.all[order[i]];
       if (block.y < 2 && this._blockBeneath(block, grid, 1)) {
-        alert('Game Over');
         document.location.reload();
         break;
       }
@@ -93,10 +92,7 @@ function Bricks() {
 
   // check if block is at bottom
   this._atBottom = function(block) {
-    console.log(block.y);
     if (block.y > 10) {
-
-      console.log('at bottom');
       return true;
     }
 

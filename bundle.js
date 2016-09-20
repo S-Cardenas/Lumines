@@ -50,12 +50,11 @@
 	    ctx = canvas.getContext("2d"),
 	    field = new Field(canvas),
 	    img = new Image(),
-	    pause = true,
 	    fps = 15;
 
 	img.src = './background.jpg';
 
-	document.addEventListener("keydown", field.keyDownHandler.bind(field), false);
+
 
 	function init() {
 	  ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -69,9 +68,6 @@
 	  field.drawField();
 	  field.drawBlocks();
 	  field.drawLine();
-	  // if (pause) {
-	  //   return;
-	  // }
 	  field.autoMoveBricks();
 	  field.moveLine();
 	  setTimeout(function(){
@@ -79,14 +75,13 @@
 
 	}
 
-	// ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-	// $('#menu').click(function() {
-	//   $(this).attr("id", "noMenu");
-	//   pause = false;
-	//   init();
-	// });
-
-	init();
+	ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+	$('.play-button').click(function() {
+	  $('.menu').attr("class", "noMenu");
+	  field.pause = false;
+	  document.addEventListener("keydown", field.keyDownHandler.bind(field), false);
+	  init();
+	});
 
 
 /***/ },
@@ -109,6 +104,7 @@
 	  this.nextBricks = [];
 	  this.spacePressed = false;
 	  this.score = 0;
+	  this.paused = true;
 	  this.lineX = 120; // X coordinate of the clearing line
 	  this.level = Math.floor(Math.random() * (5 - 0 + 1)) + 0; // Line speed
 	  this.lineSweeps = 0; //Counts the number of line sweeps
@@ -417,7 +413,6 @@
 	    for (let i = 0; i < order.length; i++) {
 	      let block  = this.all[order[i]];
 	      if (block.y < 2 && this._blockBeneath(block, grid, 1)) {
-	        alert('Game Over');
 	        document.location.reload();
 	        break;
 	      }
@@ -445,10 +440,7 @@
 
 	  // check if block is at bottom
 	  this._atBottom = function(block) {
-	    console.log(block.y);
 	    if (block.y > 10) {
-
-	      console.log('at bottom');
 	      return true;
 	    }
 

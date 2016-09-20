@@ -4,12 +4,11 @@ var canvas = document.getElementById('myCanvas'),
     ctx = canvas.getContext("2d"),
     field = new Field(canvas),
     img = new Image(),
-    pause = true,
     fps = 15;
 
 img.src = './background.jpg';
 
-document.addEventListener("keydown", field.keyDownHandler.bind(field), false);
+
 
 function init() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -23,9 +22,6 @@ function init() {
   field.drawField();
   field.drawBlocks();
   field.drawLine();
-  // if (pause) {
-  //   return;
-  // }
   field.autoMoveBricks();
   field.moveLine();
   setTimeout(function(){
@@ -33,11 +29,10 @@ function init() {
 
 }
 
-// ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-// $('#menu').click(function() {
-//   $(this).attr("id", "noMenu");
-//   pause = false;
-//   init();
-// });
-
-init();
+ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+$('.play-button').click(function() {
+  $('.menu').attr("class", "noMenu");
+  field.pause = false;
+  document.addEventListener("keydown", field.keyDownHandler.bind(field), false);
+  init();
+});

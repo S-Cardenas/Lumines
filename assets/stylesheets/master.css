@@ -12,7 +12,7 @@ canvas {
   position: absolute;
   color: white;
   font-family: "Comic Sans MS", cursive, sans-serif;
-  background: url("./00.-Early-Version.jpg");
+  background: url("../images/00.-Early-Version.jpg");
   background-size: cover;
   display: block;
   left: 50%;
